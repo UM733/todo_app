@@ -14,6 +14,14 @@
         <button type="submit">追加</button>
     </form>
 
+    <div style="margin: 15px 0;">
+        <a href="/delete_completed">
+            <button type="button" style="background-color: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer;">
+                完了タスクを一括削除
+            </button>
+        </a>
+    </div>
+
     <ul>
         {% for task in tasks %}
             <li>
