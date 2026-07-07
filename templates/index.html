@@ -10,6 +10,7 @@
     
     <form action="/add" method="POST">
         <input type="text" name="title" placeholder="新しいタスクを入力" required>
+        <input type="date" name="due_date">
         <button type="submit">追加</button>
     </form>
 
@@ -19,6 +20,12 @@
                 <span {% if task.completed %}style="text-decoration: line-through; color: gray;"{% endif %}>
                     {{ task.title }}
                 </span>
+                
+                {% if task.due_date %}
+                    <span style="font-size: 0.9em; color: #555; margin-left: 10px;">
+                        (期限: {{ task.due_date.strftime('%Y/%m/%d') }})
+                    </span>
+                {% endif %}
                 
                 <a href="/complete/{{ task.id }}">
                     <button type="button">
