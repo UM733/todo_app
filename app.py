@@ -10,7 +10,6 @@ db = SQLAlchemy(app)
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
-    # 【追加】完了状態を保存するカラム（デフォルトは未完了=False）
     completed = db.Column(db.Boolean, default=False) 
 
 # アプリ起動時にデータベースを作成
@@ -33,13 +32,21 @@ def add():
         db.session.commit()
     return redirect(url_for('index'))
 
-# 【新規追加】タスクの完了・未完了を切り替える機能
+# タスクの完了・未完了を切り替える機能
 @app.route('/complete/<int:task_id>')
 def complete(task_id):
-    # IDを指定してデータベースからタスクを取得（見つからなければ404エラー）
     task = Task.query.get_or_404(task_id)
-    # 現在の状態を反転させる（TrueならFalseに、FalseならTrueに）
     task.completed = not task.completed
+    db.session.commit()
+    return redirect(url_for('index'))
+
+# 【新規追加】タスクを削除する機能
+@app.route('/delete/<int:task_id>')
+def delete(task_id):
+    # IDを指定してデータベースからタスクを取得
+    task = Task.query.get_or_404(task_id)
+    # データベースから削除して保存（コミット）
+    db.session.delete(task)
     db.session.commit()
     return redirect(url_for('index'))
 

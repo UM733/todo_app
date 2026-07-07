@@ -25,6 +25,10 @@
                         {% if task.completed %}未完了に戻す{% else %}完了にする{% endif %}
                     </button>
                 </a>
+
+                <a href="/delete/{{ task.id }}">
+                    <button type="button" style="color: red;">削除</button>
+                </a>
             </li>
         {% else %}
             <li>現在タスクはありません。</li>
