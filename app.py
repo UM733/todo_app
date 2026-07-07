@@ -18,15 +18,12 @@ class Task(db.Model):
 with app.app_context():
     db.create_all()
 
-# 【修正】一覧表示機能（フィルター ＋ 期限順ソート対応）
+# 一覧表示機能（フィルター ＋ 期限順ソート対応）
 @app.route('/')
 def index():
     current_filter = request.args.get('filter', 'all')
-    
-    # 1. まずはベースとなるクエリ（問い合わせ）を作成
     query = Task.query
     
-    # 2. フィルター条件に応じて絞り込みを追加
     if current_filter == 'active':
         query = query.filter_by(completed=False)
     elif current_filter == 'completed':
@@ -34,11 +31,7 @@ def index():
     else:
         current_filter = 'all'
 
-    # 3. 【新規追加】期限が近い順にソートする処理を追加
-    # Task.due_date.is_(None) を第1条件にすることで「期限なし」を後ろに回し、
-    # その中で Task.due_date.asc()（昇順）にして期限が近い順に並べます
     tasks = query.order_by(Task.due_date.is_(None), Task.due_date.asc()).all()
-
     return render_template('index.html', tasks=tasks, current_filter=current_filter)
 
 # タスク登録機能
@@ -79,6 +72,27 @@ def delete_completed():
     Task.query.filter_by(completed=True).delete()
     db.session.commit()
     return redirect(url_for('index'))
+
+# 【新規追加】タスクの編集・更新機能
+@app.route('/edit/<int:task_id>', methods=['GET', 'POST'])
+def edit(task_id):
+    task = Task.query.get_or_404(task_id)
+    
+    # ボタンが押されてデータが送られてきた場合（更新処理）
+    if request.method == 'POST':
+        task.title = request.form.get('title')
+        due_date_str = request.form.get('due_date')
+        
+        if due_date_str:
+            task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+        else:
+            task.due_date = None  # 期限が空欄にされた場合は無しにする
+            
+        db.session.commit()
+        return redirect(url_for('index'))
+        
+    # 普通にアクセスされた場合（編集画面の表示）
+    return render_template('edit.html', task=task)
 
 if __name__ == '__main__':
     app.run(debug=True)

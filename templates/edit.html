@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タスクの編集</title>
+</head>
+<body>
+    <h1>タスクの編集</h1>
+    
+    <form action="/edit/{{ task.id }}" method="POST">
+        <input type="text" name="title" value="{{ task.title }}" required>
+        <input type="date" name="due_date" value="{% if task.due_date %}{{ task.due_date.strftime('%Y-%m-%d') }}{% endif %}">
+        <button type="submit">更新</button>
+    </form>
+    
+    <br>
+    <a href="/">変更せずに戻る</a>
+</body>
+</html>
