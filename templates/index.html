@@ -52,26 +52,28 @@
         <div class="card shadow-sm">
             <ul class="list-group list-group-flush">
                 {% for task in tasks %}
-                    <li class="list-group-item d-flex align-items-center justify-content-between p-3">
-                        <div class="d-flex align-items-center flex-grow-1 me-3">
+                    <li class="list-group-item d-flex flex-column flex-sm-row align-items-sm-center justify-content-between p-3 gap-3">
+                        
+                        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center flex-grow-1" style="min-width: 0;">
+                            
                             {% if task.completed %}
-                                <span class="text-decoration-line-through text-muted fs-5 flex-grow-1">
+                                <span class="text-decoration-line-through text-muted fs-5 text-break mb-2 mb-sm-0 me-sm-3">
                                     {{ task.title }}
                                 </span>
                             {% else %}
-                                <span class="fs-5 flex-grow-1 text-dark fw-semibold">
+                                <span class="fs-5 text-dark fw-semibold text-break mb-2 mb-sm-0 me-sm-3">
                                     {{ task.title }}
                                 </span>
                             {% endif %}
                             
                             {% if task.due_date %}
-                                <span class="badge {% if task.completed %}bg-secondary{% else %}bg-warning text-dark{% endif %} ms-2">
+                                <span class="badge {% if task.completed %}bg-secondary{% else %}bg-warning text-dark{% endif %} text-nowrap">
                                     <i class="bi bi-calendar-event"></i> {{ task.due_date.strftime('%Y/%m/%d') }}
                                 </span>
                             {% endif %}
                         </div>
                         
-                        <div class="btn-group shadow-sm" role="group">
+                        <div class="btn-group shadow-sm flex-shrink-0 align-self-end align-self-sm-center" role="group">
                             <a href="/complete/{{ task.id }}" class="btn {% if task.completed %}btn-secondary{% else %}btn-success{% endif %} btn-sm" title="状態変更">
                                 {% if task.completed %}<i class="bi bi-arrow-counterclockwise"></i> 戻す{% else %}<i class="bi bi-check-lg"></i> 完了{% endif %}
                             </a>
