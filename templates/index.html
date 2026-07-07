@@ -15,7 +15,17 @@
 
     <ul>
         {% for task in tasks %}
-            <li>{{ task.title }}</li>
+            <li>
+                <span {% if task.completed %}style="text-decoration: line-through; color: gray;"{% endif %}>
+                    {{ task.title }}
+                </span>
+                
+                <a href="/complete/{{ task.id }}">
+                    <button type="button">
+                        {% if task.completed %}未完了に戻す{% else %}完了にする{% endif %}
+                    </button>
+                </a>
+            </li>
         {% else %}
             <li>現在タスクはありません。</li>
         {% endfor %}
