@@ -22,6 +22,24 @@
         </a>
     </div>
 
+    <div style="margin-bottom: 15px;">
+        <a href="/?filter=all" style="text-decoration: none;">
+            <button type="button" style="padding: 5px 15px; cursor: pointer; {% if current_filter == 'all' %}background-color: #ddd; font-weight: bold;{% endif %}">
+                すべて
+            </button>
+        </a>
+        <a href="/?filter=active" style="text-decoration: none;">
+            <button type="button" style="padding: 5px 15px; cursor: pointer; {% if current_filter == 'active' %}background-color: #ddd; font-weight: bold;{% endif %}">
+                未完了
+            </button>
+        </a>
+        <a href="/?filter=completed" style="text-decoration: none;">
+            <button type="button" style="padding: 5px 15px; cursor: pointer; {% if current_filter == 'completed' %}background-color: #ddd; font-weight: bold;{% endif %}">
+                完了済み
+            </button>
+        </a>
+    </div>
+
     <ul>
         {% for task in tasks %}
             <li>
@@ -46,7 +64,7 @@
                 </a>
             </li>
         {% else %}
-            <li>現在タスクはありません。</li>
+            <li>表示するタスクはありません。</li>
         {% endfor %}
     </ul>
 </body>

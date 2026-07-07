@@ -18,11 +18,26 @@ class Task(db.Model):
 with app.app_context():
     db.create_all()
 
-# 一覧表示機能（トップページ）
+# 【修正】一覧表示機能（フィルター対応）
 @app.route('/')
 def index():
-    tasks = Task.query.all()
-    return render_template('index.html', tasks=tasks)
+    # URLから filter パラメータを取得（指定がなければ 'all' にする）
+    current_filter = request.args.get('filter', 'all')
+    
+    # フィルター条件に応じてデータベースから取得するデータを切り替える
+    if current_filter == 'active':
+        # 未完了（completed が False）のタスクだけを取得
+        tasks = Task.query.filter_by(completed=False).all()
+    elif current_filter == 'completed':
+        # 完了済み（completed が True）のタスクだけを取得
+        tasks = Task.query.filter_by(completed=True).all()
+    else:
+        # すべてのタスクを取得
+        tasks = Task.query.all()
+        current_filter = 'all'
+
+    # HTML側に、タスク一覧と「現在選ばれているフィルター」を渡す
+    return render_template('index.html', tasks=tasks, current_filter=current_filter)
 
 # タスク登録機能
 @app.route('/add', methods=['POST'])
@@ -46,6 +61,7 @@ def complete(task_id):
     task = Task.query.get_or_404(task_id)
     task.completed = not task.completed
     db.session.commit()
+    # 【ヒント】現在のフィルター状態を維持して戻ることも可能ですが、まずはシンプルにトップへ戻します
     return redirect(url_for('index'))
 
 # タスクを削除する機能
@@ -56,10 +72,9 @@ def delete(task_id):
     db.session.commit()
     return redirect(url_for('index'))
 
-# 【新規追加】完了済みのタスクを一括削除する機能
+# 完了済みのタスクを一括削除する機能
 @app.route('/delete_completed')
 def delete_completed():
-    # データベースから completed が True のタスクをすべて削除
     Task.query.filter_by(completed=True).delete()
     db.session.commit()
     return redirect(url_for('index'))
