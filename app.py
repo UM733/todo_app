@@ -18,25 +18,27 @@ class Task(db.Model):
 with app.app_context():
     db.create_all()
 
-# 【修正】一覧表示機能（フィルター対応）
+# 【修正】一覧表示機能（フィルター ＋ 期限順ソート対応）
 @app.route('/')
 def index():
-    # URLから filter パラメータを取得（指定がなければ 'all' にする）
     current_filter = request.args.get('filter', 'all')
     
-    # フィルター条件に応じてデータベースから取得するデータを切り替える
+    # 1. まずはベースとなるクエリ（問い合わせ）を作成
+    query = Task.query
+    
+    # 2. フィルター条件に応じて絞り込みを追加
     if current_filter == 'active':
-        # 未完了（completed が False）のタスクだけを取得
-        tasks = Task.query.filter_by(completed=False).all()
+        query = query.filter_by(completed=False)
     elif current_filter == 'completed':
-        # 完了済み（completed が True）のタスクだけを取得
-        tasks = Task.query.filter_by(completed=True).all()
+        query = query.filter_by(completed=True)
     else:
-        # すべてのタスクを取得
-        tasks = Task.query.all()
         current_filter = 'all'
 
-    # HTML側に、タスク一覧と「現在選ばれているフィルター」を渡す
+    # 3. 【新規追加】期限が近い順にソートする処理を追加
+    # Task.due_date.is_(None) を第1条件にすることで「期限なし」を後ろに回し、
+    # その中で Task.due_date.asc()（昇順）にして期限が近い順に並べます
+    tasks = query.order_by(Task.due_date.is_(None), Task.due_date.asc()).all()
+
     return render_template('index.html', tasks=tasks, current_filter=current_filter)
 
 # タスク登録機能
@@ -61,7 +63,6 @@ def complete(task_id):
     task = Task.query.get_or_404(task_id)
     task.completed = not task.completed
     db.session.commit()
-    # 【ヒント】現在のフィルター状態を維持して戻ることも可能ですが、まずはシンプルにトップへ戻します
     return redirect(url_for('index'))
 
 # タスクを削除する機能
